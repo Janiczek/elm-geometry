@@ -43,7 +43,7 @@ regularTest =
     Test.describe "regular"
         [ Test.check3 "A centroid of a regular polygon is in the center"
             Random.point2d
-            Random.length
+            Random.nonzeroLength
             (Fuzz.intRange 3 300)
           <|
             \center radius sides ->
@@ -314,7 +314,7 @@ rotatingAroundCentroidKeepsCentroid =
 rectangleCentroidIsInTheCenter : Test
 rectangleCentroidIsInTheCenter =
     Test.check "The centroid of rectangle is in the center point"
-        Random.rectangle2d
+        Random.nondegenerateRectangle2d
         (\rectangle ->
             case
                 rectangle

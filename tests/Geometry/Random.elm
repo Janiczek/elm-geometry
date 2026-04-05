@@ -1,9 +1,9 @@
 module Geometry.Random exposing
-    ( parameterValue, scale, length, positiveLength, angle, unitlessQuantity, unitlessInterval
+    ( parameterValue, scale, length, nonzeroLength, positiveLength, nonzeroPositiveLength, angle, unitlessQuantity, unitlessInterval
     , direction2d, direction3d, vector2d, vector3d, point2d, point3d
     , boundingBox2d, boundingBox3d, vectorBoundingBox2d, vectorBoundingBox3d
     , axis2d, axis3d, plane3d, sketchPlane3d, frame2d, frame3d
-    , lineSegment2d, lineSegment3d, triangle2d, triangle3d, rectangle2d, rectangle3d, polygon2d, block3d
+    , lineSegment2d, lineSegment3d, triangle2d, triangle3d, rectangle2d, nondegenerateRectangle2d, rectangle3d, polygon2d, block3d
     , arc2d, arc3d, circle2d, circle3d, ellipticalArc2d, ellipticalArc3d, ellipse2d
     , quadraticSpline2d, quadraticSpline3d, cubicSpline2d, cubicSpline3d, rationalQuadraticSpline2d, rationalQuadraticSpline3d, rationalCubicSpline2d, rationalCubicSpline3d, spline2d, spline3d
     , sphere3d, cylinder3d, cone3d, ellipsoid3d
@@ -30,7 +30,7 @@ fuzzers - for example the `axis3d` fuzzer is implemented as:
 
 # Scalars
 
-@docs parameterValue, scale, length, positiveLength, angle, unitlessQuantity, unitlessInterval
+@docs parameterValue, scale, length, nonzeroLength, positiveLength, nonzeroPositiveLength, angle, unitlessQuantity, unitlessInterval
 
 
 # Primitives
@@ -50,7 +50,7 @@ fuzzers - for example the `axis3d` fuzzer is implemented as:
 
 # Geometry
 
-@docs lineSegment2d, lineSegment3d, triangle2d, triangle3d, rectangle2d, rectangle3d, polygon2d, block3d
+@docs lineSegment2d, lineSegment3d, triangle2d, triangle3d, rectangle2d, nondegenerateRectangle2d, rectangle3d, polygon2d, block3d
 
 
 ## Arcs, circles, ellipses
@@ -161,6 +161,14 @@ length : Fuzzer Length
 length =
     Fuzz.map Length.meters (Fuzz.floatRange -10 10)
 
+{-| Fuzz a length between -10 meters and +10 meters (excluding 0).
+-}
+nonzeroLength : Fuzzer Length
+nonzeroLength =
+    Fuzz.floatRange -10 10
+        |> Fuzz.filter (\n -> n /= 0)
+        |> Fuzz.map Length.meters
+
 
 {-| Fuzz a random unitless quantity between -10 and +10.
 -}
@@ -181,6 +189,15 @@ unitlessInterval =
 positiveLength : Fuzzer Length
 positiveLength =
     Fuzz.map Quantity.abs length
+
+
+{-| Fuzz a random length between 0 and 10 meters (excluding 0).
+-}
+nonzeroPositiveLength : Fuzzer Length
+nonzeroPositiveLength =
+    Fuzz.floatRange -10 10
+        |> Fuzz.filter (\n -> n > 0)
+        |> Fuzz.map Length.meters
 
 
 {-| Fuzz a random angle between -360 and +360 degrees.
@@ -365,6 +382,16 @@ rectangle2d =
             Rectangle2d.centeredOn axes ( width, height )
     in
     Fuzz.map3 rectangle frame2d positiveLength positiveLength
+
+
+{-| -}
+nondegenerateRectangle2d : Fuzzer (Rectangle2d Meters coordinates)
+nondegenerateRectangle2d =
+    let
+        rectangle axes width height =
+            Rectangle2d.centeredOn axes ( width, height )
+    in
+    Fuzz.map3 rectangle frame2d nonzeroPositiveLength nonzeroPositiveLength
 
 
 {-| -}
