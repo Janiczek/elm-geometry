@@ -12,6 +12,7 @@ import Axis3d exposing (Axis3d)
 import BoundingBox3d exposing (BoundingBox3d)
 import Frame3d exposing (Frame3d)
 import Geometry.Expect as Expect
+import Fuzz exposing (Fuzzer)
 import Geometry.Random as Random
 import Length exposing (Length, Meters)
 import LineSegment3d
@@ -20,10 +21,9 @@ import Plane3d exposing (Plane3d)
 import Point3d exposing (Point3d)
 import Polyline3d
 import Quantity
-import Random exposing (Generator)
 import SketchPlane3d exposing (SketchPlane3d)
 import Test exposing (Test)
-import Test.Random as Test
+import Geometry.FuzzTest as Test
 import Tests.Generic.Curve2d as Curve2d
 import Vector3d exposing (Vector3d)
 import VectorBoundingBox3d exposing (VectorBoundingBox3d)
@@ -38,7 +38,7 @@ type LocalCoordinates
 
 
 type alias Operations curve coordinates =
-    { generator : Generator curve
+    { fuzzer : Fuzzer curve
     , pointOn : curve -> Float -> Point3d Meters coordinates
     , boundingBox : curve -> BoundingBox3d Meters coordinates
     , firstDerivative : curve -> Float -> Vector3d Meters coordinates
@@ -76,8 +76,8 @@ transformations :
 transformations global local placeIn relativeTo =
     Test.describe "Transformations"
         [ Test.check3 "scaleAbout"
-            global.generator
-            (Random.map2 Tuple.pair Random.point3d Random.scale)
+            global.fuzzer
+            (Fuzz.map2 Tuple.pair Random.point3d Random.scale)
             Random.parameterValue
             (\curve ( basePoint, scale ) t ->
                 let
@@ -96,7 +96,7 @@ transformations global local placeIn relativeTo =
                 pointOnScaledCurve |> Expect.point3d scaledPoint
             )
         , Test.check3 "translateBy"
-            global.generator
+            global.fuzzer
             Random.vector3d
             Random.parameterValue
             (\curve displacement t ->
@@ -116,10 +116,10 @@ transformations global local placeIn relativeTo =
                 pointOnTranslatedCurve |> Expect.point3d translatedPoint
             )
         , Test.check3 "rotateAround"
-            global.generator
-            (Random.map2 Tuple.pair
+            global.fuzzer
+            (Fuzz.map2 Tuple.pair
                 Random.axis3d
-                (Random.map Angle.radians (Random.float (-2 * pi) (2 * pi)))
+                (Fuzz.map Angle.radians (Fuzz.floatRange (-2 * pi) (2 * pi)))
             )
             Random.parameterValue
             (\curve ( axis, angle ) t ->
@@ -139,7 +139,7 @@ transformations global local placeIn relativeTo =
                 pointOnRotatedCurve |> Expect.point3d rotatedPoint
             )
         , Test.check3 "mirrorAcross"
-            global.generator
+            global.fuzzer
             Random.plane3d
             Random.parameterValue
             (\curve plane t ->
@@ -159,7 +159,7 @@ transformations global local placeIn relativeTo =
                 pointOnMirroredCurve |> Expect.point3d mirroredPoint
             )
         , Test.check3 "relativeTo"
-            global.generator
+            global.fuzzer
             Random.frame3d
             Random.parameterValue
             (\globalCurve frame t ->
@@ -179,7 +179,7 @@ transformations global local placeIn relativeTo =
                 pointOnLocalCurve |> Expect.point3d localPoint
             )
         , Test.check3 "placeIn"
-            local.generator
+            local.fuzzer
             Random.frame3d
             Random.parameterValue
             (\localCurve frame t ->
@@ -204,7 +204,7 @@ transformations global local placeIn relativeTo =
 firstDerivative : Operations curve GlobalCoordinates -> Test
 firstDerivative operations =
     Test.check2 "Analytical first derivative matches numerical"
-        operations.generator
+        operations.fuzzer
         Random.parameterValue
         (\curve t ->
             let
@@ -225,7 +225,7 @@ firstDerivative operations =
 approximate : Operations curve GlobalCoordinates -> Test
 approximate operations =
     Test.check "approximate has desired accuracy"
-        operations.generator
+        operations.fuzzer
         (\curve ->
             let
                 tolerance =
@@ -261,7 +261,7 @@ approximate operations =
 boundingBox : Operations curve coordinates -> Test
 boundingBox operations =
     Test.check2 "boundingBox"
-        operations.generator
+        operations.fuzzer
         Random.parameterValue
         (\curve t ->
             operations.pointOn curve t
@@ -272,8 +272,8 @@ boundingBox operations =
 firstDerivativeBoundingBox : Operations curve coordinates -> Test
 firstDerivativeBoundingBox operations =
     Test.check2 "firstDerivativeBoundingBox"
-        operations.generator
-        (Random.float 0 1)
+        operations.fuzzer
+        (Fuzz.floatRange 0 1)
         (\curve parameterValue ->
             operations.firstDerivative curve parameterValue
                 |> Expect.vector3dContainedIn (operations.firstDerivativeBoundingBox curve)
@@ -281,15 +281,15 @@ firstDerivativeBoundingBox operations =
 
 
 secondDerivativeBoundingBox :
-    { generator : Generator curve
+    { fuzzer : Fuzzer curve
     , secondDerivative : curve -> Float -> Vector3d Meters coordinates
     , secondDerivativeBoundingBox : curve -> VectorBoundingBox3d Meters coordinates
     }
     -> Test
 secondDerivativeBoundingBox operations =
     Test.check2 "secondDerivativeBoundingBox"
-        operations.generator
-        (Random.float 0 1)
+        operations.fuzzer
+        (Fuzz.floatRange 0 1)
         (\curve parameterValue ->
             operations.secondDerivative curve parameterValue
                 |> Expect.vector3dContainedIn (operations.secondDerivativeBoundingBox curve)
@@ -300,9 +300,9 @@ projectInto : Operations curve coordinates -> (SketchPlane3d Meters coordinates 
 projectInto operations project operations2d =
     Test.describe "projectInto"
         [ Test.check3 "pointOn"
-            operations.generator
+            operations.fuzzer
             Random.sketchPlane3d
-            (Random.float 0 1)
+            (Fuzz.floatRange 0 1)
             (\curve sketchPlane parameterValue ->
                 let
                     curve2d =
@@ -320,9 +320,9 @@ projectInto operations project operations2d =
                 projectedPoint |> Expect.point2d point2d
             )
         , Test.check3 "firstDerivative"
-            operations.generator
+            operations.fuzzer
             Random.sketchPlane3d
-            (Random.float 0 1)
+            (Fuzz.floatRange 0 1)
             (\curve sketchPlane parameterValue ->
                 let
                     curve2d =

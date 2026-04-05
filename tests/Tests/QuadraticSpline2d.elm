@@ -19,16 +19,16 @@ import Length exposing (Length, Meters, inMeters, meters)
 import Point2d
 import QuadraticSpline2d exposing (QuadraticSpline2d)
 import Quantity exposing (Quantity, zero)
-import Random exposing (Generator)
+import Fuzz exposing (Fuzzer)
 import Test exposing (Test)
-import Test.Random as Test
+import Geometry.FuzzTest as Test
 import Tests.Generic.Curve2d
 import Tests.Literals exposing (ok)
 
 
 curveOperations : Tests.Generic.Curve2d.Operations (QuadraticSpline2d Meters coordinates) coordinates
 curveOperations =
-    { generator = Random.quadraticSpline2d
+    { fuzzer = Random.quadraticSpline2d
     , pointOn = QuadraticSpline2d.pointOn
     , boundingBox = QuadraticSpline2d.boundingBox
     , firstDerivative = QuadraticSpline2d.firstDerivative
@@ -41,16 +41,16 @@ curveOperations =
     }
 
 
-degenerateSpline : Generator (QuadraticSpline2d Meters coordinates)
+degenerateSpline : Fuzzer (QuadraticSpline2d Meters coordinates)
 degenerateSpline =
     Random.point2d
-        |> Random.map
+        |> Fuzz.map
             (\point -> QuadraticSpline2d.fromControlPoints point point point)
 
 
-curvedSpline : Generator (QuadraticSpline2d Meters coordinates)
+curvedSpline : Fuzzer (QuadraticSpline2d Meters coordinates)
 curvedSpline =
-    Random.map5
+    Fuzz.map5
         (\angle length interpolationParameter offset flipSide ->
             let
                 x0 =
@@ -81,11 +81,11 @@ curvedSpline =
             QuadraticSpline2d.fromControlPoints p0 p1 p2
                 |> QuadraticSpline2d.rotateAround Point2d.origin angle
         )
-        (Random.map Angle.radians (Random.float 0 (2 * pi)))
-        (Random.map meters (Random.float 1 10))
+        (Fuzz.map Angle.radians (Fuzz.floatRange 0 (2 * pi)))
+        (Fuzz.map meters (Fuzz.floatRange 1 10))
         Random.parameterValue
-        (Random.map meters (Random.float 1 5))
-        (Random.uniform True [ False ])
+        (Fuzz.map meters (Fuzz.floatRange 1 5))
+        Fuzz.bool
 
 
 analyticalLength : QuadraticSpline2d Meters coordinates -> Length

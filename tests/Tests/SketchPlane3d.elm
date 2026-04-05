@@ -9,7 +9,7 @@ import Geometry.Expect as Expect
 import Geometry.Random as Random
 import SketchPlane3d
 import Test exposing (Test)
-import Test.Random as Test
+import Geometry.FuzzTest as Test
 
 
 randomlyGeneratedSketchPlanesAreValid : Test

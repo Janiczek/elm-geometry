@@ -16,9 +16,9 @@ import Expect
 import Geometry.Expect as Expect
 import Geometry.Random as Random
 import Quantity
-import Random
+import Fuzz
 import Test exposing (Test)
-import Test.Random as Test
+import Geometry.FuzzTest as Test
 import Vector2d
 
 
@@ -150,7 +150,7 @@ vectorScaling =
         [ Test.check "scaling a zero vector results in a zero vector" Random.length <|
             \len ->
                 Expect.equal Vector2d.zero (Vector2d.scaleTo len Vector2d.zero)
-        , Test.check "scaleTo has a consistent length" (Random.pair Random.length Random.vector2d) <|
+        , Test.check "scaleTo has a consistent length" (Fuzz.pair Random.length Random.vector2d) <|
             \( scale, vector ) ->
                 if vector == Vector2d.zero then
                     Vector2d.scaleTo scale vector

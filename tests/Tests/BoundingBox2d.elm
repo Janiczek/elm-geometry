@@ -22,9 +22,8 @@ import Expect
 import Geometry.Expect as Expect
 import Geometry.Random as Random
 import Quantity
-import Random
 import Test exposing (Test)
-import Test.Random as Test
+import Geometry.FuzzTest as Test
 import Vector2d
 
 

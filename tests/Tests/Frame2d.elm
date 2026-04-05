@@ -5,7 +5,7 @@ import Geometry.Expect as Expect
 import Geometry.Random as Random
 import Point2d
 import Test exposing (Test)
-import Test.Random as Test
+import Geometry.FuzzTest as Test
 
 
 globalToGlobal : Test

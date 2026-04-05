@@ -1,15 +1,15 @@
 module Polygon2d.Random exposing (polygon2d)
 
-import Angle exposing (Angle)
+import Angle
 import BoundingBox2d exposing (BoundingBox2d)
+import Fuzz exposing (Fuzzer)
 import Point2d exposing (Point2d)
 import Polygon2d exposing (Polygon2d)
-import Quantity exposing (Quantity)
-import Random exposing (Generator)
-import Vector2d exposing (Vector2d)
+import Quantity
+import Vector2d
 
 
-radialPolygonWithHole : BoundingBox2d units coordinates -> Generator (Polygon2d units coordinates)
+radialPolygonWithHole : BoundingBox2d units coordinates -> Fuzzer (Polygon2d units coordinates)
 radialPolygonWithHole boundingBox =
     let
         centerPoint =
@@ -28,28 +28,28 @@ radialPolygonWithHole boundingBox =
         midRadius =
             Quantity.midpoint minRadius maxRadius
 
-        innerRadiusGenerator =
-            Random.map
+        innerRadiusFuzzer =
+            Fuzz.map
                 (Quantity.interpolateFrom
                     minRadius
                     (Quantity.multiplyBy 0.95 midRadius)
                 )
-                (Random.float 0 1)
+                (Fuzz.floatRange 0 1)
 
-        outerRadiusGenerator =
-            Random.map
+        outerRadiusFuzzer =
+            Fuzz.map
                 (Quantity.interpolateFrom
                     (Quantity.multiplyBy 1.05 midRadius)
                     maxRadius
                 )
-                (Random.float 0 1)
+                (Fuzz.floatRange 0 1)
     in
-    Random.int 3 32
-        |> Random.andThen
+    Fuzz.intRange 3 32
+        |> Fuzz.andThen
             (\numPoints ->
-                Random.list numPoints
-                    (Random.pair innerRadiusGenerator outerRadiusGenerator)
-                    |> Random.map
+                Fuzz.listOfLength numPoints
+                    (Fuzz.pair innerRadiusFuzzer outerRadiusFuzzer)
+                    |> Fuzz.map
                         (List.indexedMap
                             (\index ( innerRadius, outerRadius ) ->
                                 let
@@ -75,8 +75,8 @@ radialPolygonWithHole boundingBox =
                                 ( innerPoint, outerPoint )
                             )
                         )
-                    |> Random.map List.unzip
-                    |> Random.map
+                    |> Fuzz.map List.unzip
+                    |> Fuzz.map
                         (\( innerLoop, outerLoop ) ->
                             Polygon2d.withHoles [ List.reverse innerLoop ] outerLoop
                         )
@@ -89,12 +89,12 @@ type alias GridPolygon =
     }
 
 
-localCoordinates : Generator ( Float, Float )
+localCoordinates : Fuzzer ( Float, Float )
 localCoordinates =
-    Random.map2 Tuple.pair (Random.float 0.1 0.9) (Random.float 0.1 0.9)
+    Fuzz.pair (Fuzz.floatRange 0.1 0.9) (Fuzz.floatRange 0.1 0.9)
 
 
-loopPoints : BoundingBox2d units coordinates -> List ( Int, Int ) -> Generator (List (Point2d units coordinates))
+loopPoints : BoundingBox2d units coordinates -> List ( Int, Int ) -> Fuzzer (List (Point2d units coordinates))
 loopPoints boundingBox gridCoordinates =
     let
         { minX, minY } =
@@ -125,8 +125,8 @@ loopPoints boundingBox gridCoordinates =
             in
             Point2d.xy px py
     in
-    Random.list (List.length gridCoordinates) localCoordinates
-        |> Random.map (List.map2 gridPoint gridCoordinates)
+    Fuzz.listOfLength (List.length gridCoordinates) localCoordinates
+        |> Fuzz.map (List.map2 gridPoint gridCoordinates)
 
 
 squareOuterLoop : List ( Int, Int )
@@ -310,47 +310,37 @@ interlocking =
     }
 
 
-join : List (Generator a) -> Generator (List a)
-join generators =
-    case generators of
-        [] ->
-            Random.constant []
 
-        first :: rest ->
-            Random.map2 (::) first (join rest)
-
-
-gridPolygon : BoundingBox2d units coordinates -> GridPolygon -> Generator (Polygon2d units coordinates)
+gridPolygon : BoundingBox2d units coordinates -> GridPolygon -> Fuzzer (Polygon2d units coordinates)
 gridPolygon boundingBox { outerLoop, innerLoops } =
     let
-        outerLoopGenerator =
+        outerLoopFuzzer =
             loopPoints boundingBox outerLoop
 
-        innerLoopGenerators =
+        innerLoopFuzzers =
             List.map (loopPoints boundingBox) innerLoops
     in
-    Random.map2 Polygon2d.withHoles
-        (join innerLoopGenerators)
-        outerLoopGenerator
+    Fuzz.map2 Polygon2d.withHoles
+        (Fuzz.sequence innerLoopFuzzers)
+        outerLoopFuzzer
 
 
-polygon2d : BoundingBox2d units coordinates -> Generator (Polygon2d units coordinates)
+polygon2d : BoundingBox2d units coordinates -> Fuzzer (Polygon2d units coordinates)
 polygon2d boundingBox =
-    Random.map2
+    Fuzz.map2
         (\polygon angle ->
             polygon
                 |> Polygon2d.rotateAround
                     (BoundingBox2d.centerPoint boundingBox)
                     angle
         )
-        (Random.uniform
-            (radialPolygonWithHole boundingBox)
-            [ gridPolygon boundingBox squarish
+        (Fuzz.oneOf
+            [ radialPolygonWithHole boundingBox
+            , gridPolygon boundingBox squarish
             , gridPolygon boundingBox lShaped
             , gridPolygon boundingBox squareWithHole
             , gridPolygon boundingBox squareWithTwoHoles
             , gridPolygon boundingBox interlocking
             ]
-            |> Random.andThen identity
         )
-        (Random.map Angle.radians (Random.float -pi pi))
+        (Fuzz.map Angle.radians (Fuzz.floatRange -pi pi))

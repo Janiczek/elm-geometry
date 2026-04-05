@@ -8,15 +8,14 @@ import Axis2d exposing (Axis2d)
 import Expect
 import Frame2d
 import Geometry.Expect as Expect
+import Fuzz exposing (Fuzzer)
 import Geometry.Random as Random
 import Length exposing (Meters)
 import LineSegment2d exposing (LineSegment2d)
 import Point2d exposing (Point2d)
-import Random exposing (Generator)
-import Random.Extra
 import Rectangle2d exposing (Rectangle2d)
 import Test exposing (Test)
-import Test.Random as Test
+import Geometry.FuzzTest as Test
 import Vector2d exposing (Vector2d)
 
 
@@ -64,20 +63,20 @@ mirroring axis =
     }
 
 
-transformationGenerator : Generator (Transformation coordinates)
-transformationGenerator =
-    Random.Extra.choices
-        (Random.map2 rotation Random.point2d Random.angle)
-        [ Random.map translation Random.vector2d
-        , Random.map2 scaling Random.point2d Random.scale
-        , Random.map mirroring Random.axis2d
+transformationFuzzer : Fuzzer (Transformation coordinates)
+transformationFuzzer =
+    Fuzz.oneOf
+        [ Fuzz.map2 rotation Random.point2d Random.angle
+        , Fuzz.map translation Random.vector2d
+        , Fuzz.map2 scaling Random.point2d Random.scale
+        , Fuzz.map mirroring Random.axis2d
         ]
 
 
 containmentIsConsistent : Test
 containmentIsConsistent =
     Test.check3 "Rectangle/point containment is consistent through transformation"
-        transformationGenerator
+        transformationFuzzer
         Random.rectangle2d
         Random.point2d
         (\transformation rectangle point ->
@@ -107,7 +106,7 @@ verticesAreConsistent =
     let
         testVertex description accessor =
             Test.check2 description
-                transformationGenerator
+                transformationFuzzer
                 Random.rectangle2d
                 (\transformation rectangle ->
                     let

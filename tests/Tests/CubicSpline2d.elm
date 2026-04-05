@@ -18,7 +18,7 @@ import Length exposing (Meters, meters)
 import Point2d
 import Quantity exposing (zero)
 import Test exposing (Test)
-import Test.Random as Test
+import Geometry.FuzzTest as Test
 import Tests.Generic.Curve2d
 import Tests.QuadraticSpline2d
 import Vector2d
@@ -26,7 +26,7 @@ import Vector2d
 
 curveOperations : Tests.Generic.Curve2d.Operations (CubicSpline2d Meters coordinates) coordinates
 curveOperations =
-    { generator = Random.cubicSpline2d
+    { fuzzer = Random.cubicSpline2d
     , pointOn = CubicSpline2d.pointOn
     , boundingBox = CubicSpline2d.boundingBox
     , firstDerivative = CubicSpline2d.firstDerivative
@@ -242,7 +242,7 @@ bSplinesAreContinuous =
 secondDerivativeBoundingBox : Test
 secondDerivativeBoundingBox =
     Tests.Generic.Curve2d.secondDerivativeBoundingBox
-        { generator = Random.cubicSpline2d
+        { fuzzer = Random.cubicSpline2d
         , secondDerivative = CubicSpline2d.secondDerivative
         , secondDerivativeBoundingBox = CubicSpline2d.secondDerivativeBoundingBox
         }

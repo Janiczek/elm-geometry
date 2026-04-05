@@ -18,11 +18,10 @@ import Geometry.Random as Random
 import Length exposing (Meters, meters)
 import Point2d
 import Quantity exposing (zero)
-import Random
-import Random.Extra
+import Fuzz exposing (Fuzzer)
 import SweptAngle
 import Test exposing (Test)
-import Test.Random as Test
+import Geometry.FuzzTest as Test
 import Tests.Generic.Curve2d
 
 
@@ -73,11 +72,11 @@ from : Test
 from =
     let
         validAngle =
-            Random.map Angle.degrees <|
-                Random.Extra.choices
-                    (Random.float -359 359)
-                    [ Random.float 361 719
-                    , Random.float -719 -361
+            Fuzz.map Angle.degrees <|
+                Fuzz.oneOf
+                    [ Fuzz.floatRange -359 359
+                    , Fuzz.floatRange 361 719
+                    , Fuzz.floatRange -719 -361
                     ]
     in
     Test.check3 "Arc2d.from produces the expected end point and swept angle"
@@ -97,11 +96,11 @@ withRadius : Test
 withRadius =
     let
         sweptAngleGenerator =
-            Random.uniform
-                SweptAngle.smallPositive
-                [ SweptAngle.smallNegative
-                , SweptAngle.largePositive
-                , SweptAngle.largeNegative
+            Fuzz.oneOf
+                [ Fuzz.constant SweptAngle.smallPositive
+                , Fuzz.constant SweptAngle.smallNegative
+                , Fuzz.constant SweptAngle.largePositive
+                , Fuzz.constant SweptAngle.largeNegative
                 ]
     in
     Test.check4 "Arc2d.withRadius produces the expected end point"
@@ -129,7 +128,7 @@ withRadius =
 
 curveOperations : Tests.Generic.Curve2d.Operations (Arc2d Meters coordinates) coordinates
 curveOperations =
-    { generator = Random.arc2d
+    { fuzzer = Random.arc2d
     , pointOn = Arc2d.pointOn
     , boundingBox = Arc2d.boundingBox
     , firstDerivative = Arc2d.firstDerivative

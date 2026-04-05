@@ -8,7 +8,9 @@ import BoundingBox2d
 import DelaunayTriangulation2d
 import Direction3d
 import Expect
+import Fuzz exposing (Fuzzer)
 import Geometry.Expect as Expect
+import Geometry.FuzzTest as Test
 import Geometry.Random as Random
 import Length exposing (Meters, inMeters, meters)
 import List.Extra
@@ -17,19 +19,17 @@ import Point2d exposing (Point2d)
 import Point3d
 import Polygon2d exposing (Polygon2d)
 import Quantity
-import Random exposing (Generator)
 import SketchPlane3d
 import Test exposing (Test)
-import Test.Random as Test
 import Vector3d
 import VoronoiDiagram2d
 
 
-uniquePoints : Generator (Array (Point2d Meters coordinates))
+uniquePoints : Fuzzer (Array (Point2d Meters coordinates))
 uniquePoints =
     Random.smallList Random.point2d
-        |> Random.map (List.Extra.uniqueBy (Point2d.toTuple inMeters))
-        |> Random.map Array.fromList
+        |> Fuzz.map (List.Extra.uniqueBy (Point2d.toTuple inMeters))
+        |> Fuzz.map Array.fromList
 
 
 cellForEveryInputVertex : Test

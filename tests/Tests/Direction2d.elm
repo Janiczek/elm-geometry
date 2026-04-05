@@ -26,9 +26,9 @@ import Geometry.Random as Random
 import Length exposing (meters)
 import Point2d
 import Quantity
-import Random
+import Fuzz exposing (Fuzzer)
 import Test exposing (Test)
-import Test.Random as Test
+import Geometry.FuzzTest as Test
 import Vector2d
 
 
@@ -73,7 +73,7 @@ angleFromAndRotateByAreConsistent =
 orthonormalizeProducesValidFrameBasis : Test
 orthonormalizeProducesValidFrameBasis =
     Test.check "orthonormalize produces a valid frame basis"
-        (Random.pair Random.vector2d Random.vector2d)
+        (Fuzz.pair Random.vector2d Random.vector2d)
         (\( xVector, yVector ) ->
             case Direction2d.orthonormalize xVector yVector of
                 Just ( xDirection, yDirection ) ->

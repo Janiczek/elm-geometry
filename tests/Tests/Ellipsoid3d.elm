@@ -15,7 +15,7 @@ import Quantity
 import Quantity.Interval as Interval exposing (Interval)
 import Sphere3d exposing (Sphere3d)
 import Test exposing (Test)
-import Test.Random as Test
+import Geometry.FuzzTest as Test
 
 
 

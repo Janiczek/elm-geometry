@@ -24,10 +24,10 @@ import Geometry.Random as Random
 import Plane3d
 import Point3d
 import Quantity exposing (zero)
-import Random
+import Fuzz exposing (Fuzzer)
 import SketchPlane3d
 import Test exposing (Test)
-import Test.Random as Test
+import Geometry.FuzzTest as Test
 import Triangle3d
 import Vector3d
 
@@ -95,7 +95,7 @@ midpointIsEquidistant =
 interpolationReturnsExactEndpoints : Test
 interpolationReturnsExactEndpoints =
     Test.check "Interpolation returns exact start point for t=0 and exact end point for t=1"
-        (Random.pair Random.point3d Random.point3d)
+        (Fuzz.pair Random.point3d Random.point3d)
         (Expect.all
             [ \( p1, p2 ) -> Point3d.interpolateFrom p1 p2 0 |> Expect.equal p1
             , \( p1, p2 ) -> Point3d.interpolateFrom p1 p2 1 |> Expect.equal p2

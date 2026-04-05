@@ -18,16 +18,16 @@ import Point3d
 import QuadraticSpline2d exposing (QuadraticSpline2d)
 import QuadraticSpline3d exposing (QuadraticSpline3d)
 import Quantity exposing (zero)
-import Random exposing (Generator)
+import Fuzz exposing (Fuzzer)
 import Test exposing (Test)
-import Test.Random as Test
+import Geometry.FuzzTest as Test
 import Tests.Generic.Curve3d
 import Tests.QuadraticSpline2d
 
 
 curveOperations : Tests.Generic.Curve3d.Operations (QuadraticSpline3d Meters coordinates) coordinates
 curveOperations =
-    { generator = Random.quadraticSpline3d
+    { fuzzer = Random.quadraticSpline3d
     , pointOn = QuadraticSpline3d.pointOn
     , boundingBox = QuadraticSpline3d.boundingBox
     , firstDerivative = QuadraticSpline3d.firstDerivative
@@ -115,9 +115,9 @@ analyticalLength spline =
     meters ((a_32 * s_abc + a_2 * b * (s_abc - c_2) + (4 * c * a - b * b) * logBase e ((2 * a_2 + ba + s_abc) / (ba + c_2))) / (4 * a_32))
 
 
-curvedSpline : Generator (QuadraticSpline3d Meters coordinates)
+curvedSpline : Fuzzer (QuadraticSpline3d Meters coordinates)
 curvedSpline =
-    Random.map2 QuadraticSpline3d.on
+    Fuzz.map2 QuadraticSpline3d.on
         Random.sketchPlane3d
         Tests.QuadraticSpline2d.curvedSpline
 

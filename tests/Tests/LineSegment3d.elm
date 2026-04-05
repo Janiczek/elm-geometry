@@ -10,7 +10,7 @@ import LineSegment3d
 import Point3d
 import Quantity.Interval as Interval
 import Test exposing (Test)
-import Test.Random as Test
+import Geometry.FuzzTest as Test
 
 
 signedDistanceFromContainsDistanceForAnyPoint : Test

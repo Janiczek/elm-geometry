@@ -19,20 +19,18 @@ import Direction2d
 import Direction3d
 import Expect
 import Geometry.Expect as Expect
+import Fuzz exposing (Fuzzer)
 import Geometry.Random as Random
 import Length exposing (meters)
-import LineSegment3d
 import Plane3d
 import Point2d
 import Point3d
 import Quantity
-import Random
-import Rectangle2d exposing (Rectangle2d)
 import Rectangle3d
 import SketchPlane3d
 import Sphere3d
 import Test exposing (Test)
-import Test.Random as Test
+import Geometry.FuzzTest as Test
 import Triangle3d
 import Vector3d
 
@@ -145,9 +143,9 @@ intersectionWithTriangle =
     Test.check5 "intersectionWithTriangle works properly"
         Random.triangle3d
         Random.direction3d
-        (Random.float -0.5 1.5)
-        (Random.float -0.5 1.5)
-        (Random.float -10 10)
+        (Fuzz.floatRange -0.5 1.5)
+        (Fuzz.floatRange -0.5 1.5)
+        (Fuzz.floatRange -10 10)
         (\triangle axisDirection u v t ->
             let
                 s =
@@ -206,9 +204,9 @@ intersectionWithRectangle =
     Test.check5 "intersectionWithRectangle works properly"
         Random.rectangle3d
         Random.direction3d
-        (Random.float -0.5 1.5)
-        (Random.float -0.5 1.5)
-        (Random.float -10 10)
+        (Fuzz.floatRange -0.5 1.5)
+        (Fuzz.floatRange -0.5 1.5)
+        (Fuzz.floatRange -10 10)
         (\rectangle axisDirection u v t ->
             let
                 s =

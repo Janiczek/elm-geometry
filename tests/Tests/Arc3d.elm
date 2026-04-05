@@ -16,7 +16,7 @@ import Geometry.Random as Random
 import Length exposing (Meters)
 import Point3d
 import Test exposing (Test)
-import Test.Random as Test
+import Geometry.FuzzTest as Test
 import Tests.Generic.Curve3d
 
 
@@ -89,7 +89,7 @@ projectInto =
 
 curveOperations : Tests.Generic.Curve3d.Operations (Arc3d Meters coordinates) coordinates
 curveOperations =
-    { generator = Random.arc3d
+    { fuzzer = Random.arc3d
     , pointOn = Arc3d.pointOn
     , boundingBox = Arc3d.boundingBox
     , firstDerivative = Arc3d.firstDerivative

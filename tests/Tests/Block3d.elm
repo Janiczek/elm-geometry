@@ -9,15 +9,14 @@ import Block3d exposing (Block3d)
 import Expect
 import Frame3d
 import Geometry.Expect as Expect
+import Fuzz exposing (Fuzzer)
 import Geometry.Random as Random
 import Length exposing (Meters)
 import LineSegment3d exposing (LineSegment3d)
 import Plane3d exposing (Plane3d)
 import Point3d exposing (Point3d)
-import Random exposing (Generator)
-import Random.Extra
 import Test exposing (Test)
-import Test.Random as Test
+import Geometry.FuzzTest as Test
 import Vector3d exposing (Vector3d)
 
 
@@ -65,20 +64,20 @@ mirroring plane =
     }
 
 
-transformationGenerator : Generator (Transformation coordinates)
-transformationGenerator =
-    Random.Extra.choices
-        (Random.map2 rotation Random.axis3d Random.angle)
-        [ Random.map translation Random.vector3d
-        , Random.map2 scaling Random.point3d Random.scale
-        , Random.map mirroring Random.plane3d
+transformationFuzzer : Fuzzer (Transformation coordinates)
+transformationFuzzer =
+    Fuzz.oneOf
+        [ Fuzz.map2 rotation Random.axis3d Random.angle
+        , Fuzz.map translation Random.vector3d
+        , Fuzz.map2 scaling Random.point3d Random.scale
+        , Fuzz.map mirroring Random.plane3d
         ]
 
 
 containmentIsConsistent : Test
 containmentIsConsistent =
     Test.check3 "Block/point containment is consistent through transformation"
-        transformationGenerator
+        transformationFuzzer
         Random.block3d
         Random.point3d
         (\transformation block point ->
@@ -108,7 +107,7 @@ verticesAreConsistent =
     let
         testVertex description accessor =
             Test.check2 description
-                transformationGenerator
+                transformationFuzzer
                 Random.block3d
                 (\transformation block ->
                     let

@@ -1,25 +1,28 @@
 module Tests.VectorBoundingBox3d exposing (arithmetic, length)
 
 import Expect exposing (Expectation)
+import Fuzz exposing (Fuzzer)
 import Geometry.Expect as Expect
 import Geometry.Random as Random
 import Length exposing (Meters)
 import Quantity exposing (Quantity, Unitless)
 import Quantity.Interval as Interval exposing (Interval)
-import Random exposing (Generator)
 import Test exposing (Test)
-import Test.Random as Test
+import Geometry.FuzzTest as Test
 import Vector3d exposing (Vector3d)
 import VectorBoundingBox3d exposing (VectorBoundingBox3d)
 
 
-boxAndContainedVector : Generator ( VectorBoundingBox3d Meters coordinates, Vector3d Meters coordinates )
+boxAndContainedVector : Fuzzer ( VectorBoundingBox3d Meters coordinates, Vector3d Meters coordinates )
 boxAndContainedVector =
     Random.vectorBoundingBox3d
-        |> Random.andThen
+        |> Fuzz.andThen
             (\box ->
-                VectorBoundingBox3d.randomVector box
-                    |> Random.map (\containedVector -> ( box, containedVector ))
+                Fuzz.map3
+                    (\u v w -> ( box, VectorBoundingBox3d.interpolate box u v w ))
+                    (Fuzz.floatRange 0 1)
+                    (Fuzz.floatRange 0 1)
+                    (Fuzz.floatRange 0 1)
             )
 
 

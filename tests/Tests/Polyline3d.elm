@@ -12,13 +12,13 @@ module Tests.Polyline3d exposing
 import BoundingBox3d
 import Expect
 import Geometry.Expect as Expect
+import Fuzz exposing (Fuzzer)
 import Geometry.Random as Random
 import Length exposing (meters)
 import Point3d
 import Polyline3d
-import Random
 import Test exposing (Test)
-import Test.Random as Test
+import Geometry.FuzzTest as Test
 
 
 emptyPolylineHasNothingCentroid : Test
@@ -35,7 +35,7 @@ emptyPolylineHasNothingCentroid =
 
 zeroLengthPolylineHasItselfAsCentroid : Test
 zeroLengthPolylineHasItselfAsCentroid =
-    Test.check2 "Centroid of zero length polyline is the same point" Random.point3d (Random.int 1 20) <|
+    Test.check2 "Centroid of zero length polyline is the same point" Random.point3d (Fuzz.intRange 1 20) <|
         \point reps ->
             let
                 singlePointLine =
@@ -80,7 +80,7 @@ centroidOfSingleSegmentIsSameAsMidpoint =
 
 centroidOfRightAngle : Test
 centroidOfRightAngle =
-    Test.check "Centroid of a right angle is between the two sides" (Random.float -10 10) <|
+    Test.check "Centroid of a right angle is between the two sides" (Fuzz.floatRange -10 10) <|
         \armLength ->
             let
                 angle =
@@ -99,7 +99,7 @@ centroidOfRightAngle =
 
 centroidOfStepShape : Test
 centroidOfStepShape =
-    Test.check "Centroid of a step shape is halfway up the step" (Random.float -10 10) <|
+    Test.check "Centroid of a step shape is halfway up the step" (Fuzz.floatRange -10 10) <|
         \armLength ->
             let
                 angle =
@@ -119,7 +119,7 @@ centroidOfStepShape =
 
 centroidOfOpenSquare : Test
 centroidOfOpenSquare =
-    Test.check "Centroid of an open square is skewed to closed side" (Random.float -10 10) <|
+    Test.check "Centroid of an open square is skewed to closed side" (Fuzz.floatRange -10 10) <|
         \sideLength ->
             let
                 squareline =
@@ -139,7 +139,7 @@ centroidOfOpenSquare =
 
 centroidOfClosedSquare : Test
 centroidOfClosedSquare =
-    Test.check "Centroid of a closed square is mid-point" (Random.float -10 10) <|
+    Test.check "Centroid of a closed square is mid-point" (Fuzz.floatRange -10 10) <|
         \sideLength ->
             let
                 squareline =

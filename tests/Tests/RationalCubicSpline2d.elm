@@ -13,17 +13,16 @@ import Interval
 import Length exposing (Length, Meters)
 import Point2d exposing (Point2d)
 import Quantity
-import Random
 import RationalCubicSpline2d exposing (RationalCubicSpline2d)
 import Test exposing (Test)
-import Test.Random as Test
+import Geometry.FuzzTest as Test
 import Tests.Generic.Curve2d
 import Vector2d
 
 
 curveOperations : Tests.Generic.Curve2d.Operations (RationalCubicSpline2d Meters coordinates) coordinates
 curveOperations =
-    { generator = Random.rationalCubicSpline2d
+    { fuzzer = Random.rationalCubicSpline2d
     , pointOn = RationalCubicSpline2d.pointOn
     , boundingBox = RationalCubicSpline2d.boundingBox
     , firstDerivative = RationalCubicSpline2d.firstDerivative
@@ -155,7 +154,7 @@ splitAt =
 secondDerivativeBoundingBox : Test
 secondDerivativeBoundingBox =
     Tests.Generic.Curve2d.secondDerivativeBoundingBox
-        { generator = Random.rationalCubicSpline2d
+        { fuzzer = Random.rationalCubicSpline2d
         , secondDerivative = RationalCubicSpline2d.secondDerivative
         , secondDerivativeBoundingBox = RationalCubicSpline2d.secondDerivativeBoundingBox
         }

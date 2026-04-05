@@ -12,17 +12,17 @@ module Tests.Polygon2d exposing
 
 import Angle
 import Expect
+import Fuzz
 import Geometry.Expect as Expect
+import Geometry.FuzzTest as Test
 import Geometry.Random as Random
 import Length
 import LineSegment2d
 import Point2d
 import Polygon2d
 import Quantity exposing (zero)
-import Random
 import Rectangle2d
 import Test exposing (Test)
-import Test.Random as Test
 import Triangle2d
 import TriangularMesh
 import Vector2d
@@ -44,7 +44,7 @@ regularTest =
         [ Test.check3 "A centroid of a regular polygon is in the center"
             Random.point2d
             Random.length
-            (Random.int 3 300)
+            (Fuzz.intRange 3 300)
           <|
             \center radius sides ->
                 Polygon2d.regular { centerPoint = center, circumradius = radius, numSides = sides }
@@ -53,7 +53,7 @@ regularTest =
         , Test.check3 "The area matches what we would expect from a regular polygon"
             Random.point2d
             Random.length
-            (Random.int 3 300)
+            (Fuzz.intRange 3 300)
           <|
             \center radius sides ->
                 Polygon2d.regular { centerPoint = center, circumradius = radius, numSides = sides }

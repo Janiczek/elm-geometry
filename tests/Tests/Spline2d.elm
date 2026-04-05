@@ -30,17 +30,17 @@ import Length exposing (Meters)
 import LineSegment2d
 import QuadraticSpline1d exposing (QuadraticSpline1d)
 import QuadraticSpline2d
-import Random
+import Fuzz exposing (Fuzzer)
 import Spline2d exposing (Spline2d)
 import Test exposing (Test)
-import Test.Random as Test
+import Geometry.FuzzTest as Test
 import Tests.Generic.Curve2d
 import Vector2d
 
 
 curveOperations : Tests.Generic.Curve2d.Operations (Spline2d Meters coordinates) coordinates
 curveOperations =
-    { generator = Random.spline2d
+    { fuzzer = Random.spline2d
     , pointOn = Spline2d.pointOn
     , boundingBox = Spline2d.boundingBox
     , firstDerivative = Spline2d.firstDerivative
@@ -260,8 +260,8 @@ matchesCubicSpline spline cubicSpline =
 consistentWithCubicBSpline : Test
 consistentWithCubicBSpline =
     Test.check2 "Spline2d B-spline is consistent with cubic B-spline"
-        (Random.map List.sort (Random.list 12 (Random.float 0 10)))
-        (Random.list 10 Random.point2d)
+        (Fuzz.map List.sort (Fuzz.listOfLength 12 (Fuzz.floatRange 0 10)))
+        (Fuzz.listOfLength 10 Random.point2d)
         (\knots controlPoints ->
             let
                 cubicSplineSegments =
@@ -287,8 +287,8 @@ matchesQuadraticSpline spline quadraticSpline =
 consistentWithQuadraticBSpline : Test
 consistentWithQuadraticBSpline =
     Test.check2 "Spline2d B-spline is consistent with quadratic B-spline"
-        (Random.map List.sort (Random.list 11 (Random.float 0 10)))
-        (Random.list 10 Random.point2d)
+        (Fuzz.map List.sort (Fuzz.listOfLength 11 (Fuzz.floatRange 0 10)))
+        (Fuzz.listOfLength 10 Random.point2d)
         (\knots controlPoints ->
             let
                 quadraticSplineSegments =
@@ -304,7 +304,7 @@ consistentWithQuadraticBSpline =
 consistentWithQuadraticBSplineIntervals : Test
 consistentWithQuadraticBSplineIntervals =
     Test.check "Spline2d.bSplineIntervals is consistent with QuadraticSpline2d.bSplineIntervals"
-        (Random.map List.sort (Random.list 12 (Random.float 0 10)))
+        (Fuzz.map List.sort (Fuzz.listOfLength 12 (Fuzz.floatRange 0 10)))
         (\knots ->
             Spline2d.bSplineIntervals 2 knots
                 |> Expect.equal (QuadraticSpline2d.bSplineIntervals knots)
@@ -314,7 +314,7 @@ consistentWithQuadraticBSplineIntervals =
 consistentWithCubicBSplineIntervals : Test
 consistentWithCubicBSplineIntervals =
     Test.check "Spline2d.bSplineIntervals is consistent with CubicSpline2d.bSplineIntervals"
-        (Random.map List.sort (Random.list 12 (Random.float 0 10)))
+        (Fuzz.map List.sort (Fuzz.listOfLength 12 (Fuzz.floatRange 0 10)))
         (\knots ->
             Spline2d.bSplineIntervals 3 knots
                 |> Expect.equal (CubicSpline2d.bSplineIntervals knots)
@@ -327,7 +327,7 @@ bSplineSegmentsReproducesQuadraticSpline =
         Random.point2d
         Random.point2d
         Random.point2d
-        (Random.float 0 1)
+        (Fuzz.floatRange 0 1)
         (\p1 p2 p3 t ->
             let
                 quadraticSpline =
@@ -356,7 +356,7 @@ bSplineSegmentsReproducesCubicSpline =
         Random.point2d
         Random.point2d
         Random.point2d
-        (Random.float 0 1)
+        (Fuzz.floatRange 0 1)
         (\p1 p2 p3 p4 t ->
             let
                 cubicSpline =

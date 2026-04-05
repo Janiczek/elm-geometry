@@ -25,7 +25,7 @@ import Length exposing (meters)
 import Point2d
 import Quantity
 import Test exposing (Test)
-import Test.Random as Test
+import Geometry.FuzzTest as Test
 import Vector2d
 
 

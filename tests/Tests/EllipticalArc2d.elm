@@ -15,18 +15,17 @@ import Geometry.Random as Random
 import Length exposing (Meters, meters)
 import Point2d
 import Quantity exposing (zero)
-import Random exposing (Generator)
-import Random.Extra
+import Fuzz exposing (Fuzzer)
 import SweptAngle
 import Test exposing (Test)
-import Test.Random as Test
+import Geometry.FuzzTest as Test
 import Tests.Generic.Curve2d
 import Vector2d
 
 
-reproducibleArc : Generator (Arc2d Meters coordinates)
+reproducibleArc : Fuzzer (Arc2d Meters coordinates)
 reproducibleArc =
-    Random.map4
+    Fuzz.map4
         (\centerPoint startDirection radius sweptAngle ->
             let
                 startPoint =
@@ -36,13 +35,13 @@ reproducibleArc =
         )
         Random.point2d
         Random.direction2d
-        (Random.map meters (Random.float 0.1 10))
-        (Random.map Angle.degrees <|
-            Random.Extra.choices
-                (Random.float 1 179)
-                [ Random.float 181 359
-                , Random.float -179 -1
-                , Random.float -359 -181
+        (Fuzz.map meters (Fuzz.floatRange 0.1 10))
+        (Fuzz.map Angle.degrees <|
+            Fuzz.oneOf
+                [ Fuzz.floatRange 1 179
+                , Fuzz.floatRange 181 359
+                , Fuzz.floatRange -179 -1
+                , Fuzz.floatRange -359 -181
                 ]
         )
 
@@ -126,7 +125,7 @@ reverseKeepsMidpoint =
 
 curveOperations : Tests.Generic.Curve2d.Operations (EllipticalArc2d Meters coordinates) coordinates
 curveOperations =
-    { generator = Random.ellipticalArc2d
+    { fuzzer = Random.ellipticalArc2d
     , pointOn = EllipticalArc2d.pointOn
     , boundingBox = EllipticalArc2d.boundingBox
     , firstDerivative = EllipticalArc2d.firstDerivative

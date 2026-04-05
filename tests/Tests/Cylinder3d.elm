@@ -7,15 +7,14 @@ import Cylinder3d exposing (Cylinder3d)
 import Expect
 import Frame3d exposing (Frame3d)
 import Geometry.Expect as Expect
+import Fuzz exposing (Fuzzer)
 import Geometry.Random as Random
 import Length exposing (Meters)
 import Plane3d exposing (Plane3d)
 import Point3d exposing (Point3d)
 import Quantity exposing (Quantity)
-import Random exposing (Generator)
-import Random.Extra
 import Test exposing (Test)
-import Test.Random as Test
+import Geometry.FuzzTest as Test
 import Vector3d exposing (Vector3d)
 
 
@@ -63,19 +62,19 @@ mirroring plane =
     }
 
 
-transformationGenerator : Generator (Transformation coordinates)
-transformationGenerator =
-    Random.Extra.choices
-        (Random.map2 rotation Random.axis3d Random.angle)
-        [ Random.map translation Random.vector3d
-        , Random.map2 scaling Random.point3d Random.scale
-        , Random.map mirroring Random.plane3d
+transformationFuzzer : Fuzzer (Transformation coordinates)
+transformationFuzzer =
+    Fuzz.oneOf
+        [ Fuzz.map2 rotation Random.axis3d Random.angle
+        , Fuzz.map translation Random.vector3d
+        , Fuzz.map2 scaling Random.point3d Random.scale
+        , Fuzz.map mirroring Random.plane3d
         ]
 
 
-cylinderAndPoint : Generator ( Cylinder3d Meters coordinates, Point3d Meters coordinates )
+cylinderAndPoint : Fuzzer ( Cylinder3d Meters coordinates, Point3d Meters coordinates )
 cylinderAndPoint =
-    Random.map4
+    Fuzz.map4
         (\cylinder u v theta ->
             let
                 halfLength =
@@ -118,7 +117,7 @@ suite =
     Test.describe "Cylinder3d"
         [ Test.check2 "Point containment is consistent"
             cylinderAndPoint
-            transformationGenerator
+            transformationFuzzer
             (\( cylinder, point ) transformation ->
                 let
                     initialContainment =
@@ -142,7 +141,7 @@ suite =
         , let
             testCap description accessor =
                 Test.check2 description
-                    transformationGenerator
+                    transformationFuzzer
                     Random.cylinder3d
                     (\transformation cylinder ->
                         let

@@ -13,17 +13,16 @@ import Interval
 import Length exposing (Length, Meters)
 import Point3d exposing (Point3d)
 import Quantity
-import Random
 import RationalCubicSpline3d exposing (RationalCubicSpline3d)
 import Test exposing (Test)
-import Test.Random as Test
+import Geometry.FuzzTest as Test
 import Tests.Generic.Curve3d
 import Vector3d
 
 
 curveOperations : Tests.Generic.Curve3d.Operations (RationalCubicSpline3d Meters coordinates) coordinates
 curveOperations =
-    { generator = Random.rationalCubicSpline3d
+    { fuzzer = Random.rationalCubicSpline3d
     , pointOn = RationalCubicSpline3d.pointOn
     , boundingBox = RationalCubicSpline3d.boundingBox
     , firstDerivative = RationalCubicSpline3d.firstDerivative
@@ -153,7 +152,7 @@ splitAt =
 secondDerivativeBoundingBox : Test
 secondDerivativeBoundingBox =
     Tests.Generic.Curve3d.secondDerivativeBoundingBox
-        { generator = Random.rationalCubicSpline3d
+        { fuzzer = Random.rationalCubicSpline3d
         , secondDerivative = RationalCubicSpline3d.secondDerivative
         , secondDerivativeBoundingBox = RationalCubicSpline3d.secondDerivativeBoundingBox
         }

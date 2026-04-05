@@ -18,10 +18,9 @@ import Geometry.Random as Random
 import Length exposing (meters)
 import Point3d
 import Quantity exposing (Quantity(..))
-import Random
 import SketchPlane3d
 import Test exposing (Test)
-import Test.Random as Test
+import Geometry.FuzzTest as Test
 import Vector3d
 import Volume exposing (cubicMeters)
 

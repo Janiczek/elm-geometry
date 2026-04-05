@@ -6,16 +6,15 @@ import Circle3d exposing (Circle3d)
 import Cone3d exposing (Cone3d)
 import Expect
 import Frame3d exposing (Frame3d)
+import Fuzz exposing (Fuzzer)
 import Geometry.Expect as Expect
 import Geometry.Random as Random
 import Length exposing (Meters)
 import Plane3d exposing (Plane3d)
 import Point3d exposing (Point3d)
 import Quantity exposing (Quantity)
-import Random exposing (Generator)
-import Random.Extra
 import Test exposing (Test)
-import Test.Random as Test
+import Geometry.FuzzTest as Test
 import Vector3d exposing (Vector3d)
 
 
@@ -63,19 +62,19 @@ mirroring plane =
     }
 
 
-transformationGenerator : Generator (Transformation coordinates)
-transformationGenerator =
-    Random.Extra.choices
-        (Random.map2 rotation Random.axis3d Random.angle)
-        [ Random.map translation Random.vector3d
-        , Random.map2 scaling Random.point3d Random.scale
-        , Random.map mirroring Random.plane3d
+transformationFuzzer : Fuzzer (Transformation coordinates)
+transformationFuzzer =
+    Fuzz.oneOf
+        [ Fuzz.map2 rotation Random.axis3d Random.angle
+        , Fuzz.map translation Random.vector3d
+        , Fuzz.map2 scaling Random.point3d Random.scale
+        , Fuzz.map mirroring Random.plane3d
         ]
 
 
-coneAndPoint : Generator ( Cone3d Meters coordinates, Point3d Meters coordinates )
+coneAndPoint : Fuzzer ( Cone3d Meters coordinates, Point3d Meters coordinates )
 coneAndPoint =
-    Random.map4
+    Fuzz.map4
         (\cone u v theta ->
             let
                 halfLength =
@@ -118,7 +117,7 @@ suite =
     Test.describe "Cone3d"
         [ Test.check2 "Point containment is consistent"
             coneAndPoint
-            transformationGenerator
+            transformationFuzzer
             (\( cone, point ) transformation ->
                 let
                     initialContainment =
@@ -140,7 +139,7 @@ suite =
                     finalContainment |> Expect.equal initialContainment
             )
         , Test.check2 "Base is consistent through transformation"
-            transformationGenerator
+            transformationFuzzer
             Random.cone3d
             (\transformation cone ->
                 let

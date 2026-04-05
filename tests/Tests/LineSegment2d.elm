@@ -13,16 +13,18 @@ module Tests.LineSegment2d exposing
     )
 
 import Axis2d
+import Area exposing (inSquareMeters)
 import Expect
 import Geometry.Expect as Expect
 import Geometry.Random as Random
+import Length exposing (inMeters)
 import Length exposing (meters)
 import LineSegment2d
 import Point2d
 import Quantity
 import Quantity.Interval as Interval
 import Test exposing (Test)
-import Test.Random as Test
+import Geometry.FuzzTest as Test
 import Triangle2d
 import Vector2d
 

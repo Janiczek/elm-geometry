@@ -16,7 +16,7 @@ import Geometry.Types exposing (CubicSpline3d)
 import Length exposing (Meters, meters)
 import Quantity exposing (zero)
 import Test exposing (Test)
-import Test.Random as Test
+import Geometry.FuzzTest as Test
 import Tests.Generic.Curve3d
 import Tests.QuadraticSpline3d
 
@@ -141,7 +141,7 @@ bSplineReproducesSpline =
 
 curveOperations : Tests.Generic.Curve3d.Operations (CubicSpline3d Meters coordinates) coordinates
 curveOperations =
-    { generator = Random.cubicSpline3d
+    { fuzzer = Random.cubicSpline3d
     , pointOn = CubicSpline3d.pointOn
     , boundingBox = CubicSpline3d.boundingBox
     , firstDerivative = CubicSpline3d.firstDerivative
@@ -166,7 +166,7 @@ genericTests =
 secondDerivativeBoundingBox : Test
 secondDerivativeBoundingBox =
     Tests.Generic.Curve3d.secondDerivativeBoundingBox
-        { generator = Random.cubicSpline3d
+        { fuzzer = Random.cubicSpline3d
         , secondDerivative = CubicSpline3d.secondDerivative
         , secondDerivativeBoundingBox = CubicSpline3d.secondDerivativeBoundingBox
         }

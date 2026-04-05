@@ -7,29 +7,24 @@ module Tests.DelaunayTriangulation2d exposing
 import Array exposing (Array)
 import Circle2d
 import DelaunayTriangulation2d
-import Direction3d
 import Expect
+import Fuzz exposing (Fuzzer)
 import Geometry.Expect as Expect
 import Geometry.Random as Random
-import Length exposing (Meters, inMeters, meters)
+import Geometry.FuzzTest as Test
+import Length exposing (Meters, inMeters)
 import List.Extra
-import Plane3d
 import Point2d exposing (Point2d)
-import Point3d
 import Quantity
-import Random exposing (Generator)
-import SketchPlane3d
 import Test exposing (Test)
-import Test.Random as Test
 import Triangle2d
-import Vector3d
 
 
-uniquePoints : Generator (Array (Point2d Meters coordinates))
+uniquePoints : Fuzzer (Array (Point2d Meters coordinates))
 uniquePoints =
     Random.smallList Random.point2d
-        |> Random.map (List.Extra.uniqueBy (Point2d.toTuple inMeters))
-        |> Random.map Array.fromList
+        |> Fuzz.map (List.Extra.uniqueBy (Point2d.toTuple inMeters))
+        |> Fuzz.map Array.fromList
 
 
 allDelaunayTrianglesHaveNonzeroArea : Test

@@ -27,10 +27,10 @@ import Length exposing (Meters, meters)
 import Plane3d
 import Point3d exposing (Point3d)
 import Quantity exposing (Cubed, Quantity, Squared, Unitless)
-import Random
+import Fuzz exposing (Fuzzer)
 import Sphere3d exposing (Sphere3d)
 import Test exposing (Test)
-import Test.Random as Test
+import Geometry.FuzzTest as Test
 import Triangle3d
 import Vector3d
 import Volume exposing (Volume)
@@ -298,7 +298,7 @@ scaleAbout =
             )
         , Test.check3 "scaling and unscaling has no effect on the sphere"
             Random.point3d
-            (Random.int 2 10)
+            (Fuzz.intRange 2 10)
             Random.sphere3d
             (\point scale sphere ->
                 sphere
@@ -383,7 +383,7 @@ rotateAround =
             )
         , Test.check3 "rotates by the correct angle"
             Random.axis3d
-            (Random.map Angle.radians (Random.float 0 pi))
+            (Fuzz.map Angle.radians (Fuzz.floatRange 0 pi))
             Random.sphere3d
             (\axis angle sphere ->
                 let
@@ -395,34 +395,34 @@ rotateAround =
                     centerDistanceFromAxis
                         |> Quantity.greaterThan (meters 0.001)
                 then
-                    let
-                        orthogonalDirectionFromAxisTo point =
-                            point
-                                |> Point3d.projectOntoAxis axis
-                                |> Direction3d.from point
+                let
+                    orthogonalDirectionFromAxisTo point =
+                        point
+                            |> Point3d.projectOntoAxis axis
+                            |> Direction3d.from point
 
-                        maybeOriginalDirection =
-                            orthogonalDirectionFromAxisTo
-                                (Sphere3d.centerPoint sphere)
+                    maybeOriginalDirection =
+                        orthogonalDirectionFromAxisTo
+                            (Sphere3d.centerPoint sphere)
 
-                        maybeRotatedDirection =
-                            sphere
-                                |> Sphere3d.rotateAround axis angle
-                                |> Sphere3d.centerPoint
-                                |> orthogonalDirectionFromAxisTo
-                    in
-                    case ( maybeOriginalDirection, maybeRotatedDirection ) of
-                        ( Just originalDirection, Just rotatedDirection ) ->
-                            let
-                                angleBetweenDirections =
-                                    Direction3d.angleFrom originalDirection
-                                        rotatedDirection
-                            in
-                            angleBetweenDirections
-                                |> Expect.quantity angle
+                    maybeRotatedDirection =
+                        sphere
+                            |> Sphere3d.rotateAround axis angle
+                            |> Sphere3d.centerPoint
+                            |> orthogonalDirectionFromAxisTo
+                in
+                case ( maybeOriginalDirection, maybeRotatedDirection ) of
+                    ( Just originalDirection, Just rotatedDirection ) ->
+                        let
+                            angleBetweenDirections =
+                                Direction3d.angleFrom originalDirection
+                                    rotatedDirection
+                        in
+                        angleBetweenDirections
+                            |> Expect.quantity angle
 
-                        _ ->
-                            Expect.fail "Failed to compute radial directions"
+                    _ ->
+                        Expect.fail "Failed to compute radial directions"
 
                 else
                     -- Don't bother checking with very small radii since
