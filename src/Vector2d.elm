@@ -198,12 +198,12 @@ useful when writing generic/library code.
 
 import Acceleration exposing (MetersPerSecondSquared)
 import Angle exposing (Angle)
-import Float.Extra as Float
 import Force exposing (Newtons)
+import Geometry.Hypot as Hypot
 import Geometry.Types as Types exposing (Axis2d, Direction2d, Frame2d, Point2d)
 import Length exposing (Meters)
 import Pixels exposing (Pixels)
-import Quantity exposing (Product, Quantity(..), Rate, Squared, Unitless)
+import Quantity exposing (Product, Quantity(..), Rate, Unitless)
 import Quantity.Extra as Quantity
 import Speed exposing (MetersPerSecond)
 
@@ -787,7 +787,7 @@ length (Types.Vector2d v) =
                 v.y / largestComponent
 
             scaledLength =
-                sqrt (scaledX * scaledX + scaledY * scaledY)
+                Hypot.hypot2 scaledX scaledY
         in
         Quantity (scaledLength * largestComponent)
 
@@ -820,7 +820,7 @@ direction (Types.Vector2d v) =
                 v.y / largestComponent
 
             scaledLength =
-                sqrt (scaledX * scaledX + scaledY * scaledY)
+                Hypot.hypot2 scaledX scaledY
         in
         Just <|
             Types.Direction2d
@@ -971,7 +971,7 @@ with area units!
 -}
 cross : Vector2d units2 coordinates -> Vector2d units1 coordinates -> Quantity Float (Product units1 units2)
 cross (Types.Vector2d v2) (Types.Vector2d v1) =
-    Quantity (v1.x * v2.y - v1.y * v2.x)
+    Quantity (v2.y * v1.x + v1.y * negate v2.x)
 
 
 {-| Find the sum of a list of vectors.
@@ -1162,7 +1162,7 @@ scaleTo (Quantity q) (Types.Vector2d v) =
                 v.y / largestComponent
 
             scaledLength =
-                sqrt (scaledX * scaledX + scaledY * scaledY)
+                Hypot.hypot2 scaledX scaledY
         in
         Types.Vector2d
             { x = q * scaledX / scaledLength

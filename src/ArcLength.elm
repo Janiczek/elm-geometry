@@ -185,28 +185,28 @@ buildTree derivativeMagnitude lengthAtStart_ paramAtStart_ paramAtEnd height =
                 lengthAtStart_
 
             length1 =
-                length0 + paramStep * derivativeMagnitude0
+                derivativeMagnitude0 * paramStep + length0
 
             length2 =
-                length1 + paramStep * derivativeMagnitude1
+                derivativeMagnitude1 * paramStep + length1
 
             length3 =
-                length2 + paramStep * derivativeMagnitude2
+                derivativeMagnitude2 * paramStep + length2
 
             length4 =
-                length3 + paramStep * derivativeMagnitude3
+                derivativeMagnitude3 * paramStep + length3
 
             length5 =
-                length4 + paramStep * derivativeMagnitude4
+                derivativeMagnitude4 * paramStep + length4
 
             length6 =
-                length5 + paramStep * derivativeMagnitude5
+                derivativeMagnitude5 * paramStep + length5
 
             length7 =
-                length6 + paramStep * derivativeMagnitude6
+                derivativeMagnitude6 * paramStep + length6
 
             length8 =
-                length7 + paramStep * derivativeMagnitude7
+                derivativeMagnitude7 * paramStep + length7
         in
         Leaf
             { param0 = param0

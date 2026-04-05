@@ -201,12 +201,12 @@ useful when writing generic/library code.
 
 import Acceleration exposing (MetersPerSecondSquared)
 import Angle exposing (Angle)
-import Float.Extra as Float
 import Force exposing (Newtons)
-import Geometry.Types as Types exposing (Axis3d, Direction3d, Frame3d, Plane3d, Point3d, SketchPlane3d)
+import Geometry.Hypot as Hypot
+import Geometry.Types as Types exposing (Direction3d, Frame3d, Plane3d, Point3d, SketchPlane3d)
 import Length exposing (Meters)
 import Pixels exposing (Pixels)
-import Quantity exposing (Cubed, Product, Quantity(..), Rate, Squared, Unitless)
+import Quantity exposing (Product, Quantity(..), Rate, Unitless)
 import Quantity.Extra as Quantity
 import Speed exposing (MetersPerSecond)
 import Vector2d exposing (Vector2d)
@@ -905,7 +905,7 @@ length (Types.Vector3d v) =
                 v.z / largestComponent
 
             scaledLength =
-                sqrt (scaledX * scaledX + scaledY * scaledY + scaledZ * scaledZ)
+                Hypot.hypot3 scaledX scaledY scaledZ
         in
         Quantity (scaledLength * largestComponent)
 
@@ -941,7 +941,7 @@ direction (Types.Vector3d v) =
                 v.z / largestComponent
 
             scaledLength =
-                sqrt (scaledX * scaledX + scaledY * scaledY + scaledZ * scaledZ)
+                Hypot.hypot3 scaledX scaledY scaledZ
         in
         Just <|
             Types.Direction3d
@@ -1304,7 +1304,7 @@ scaleTo (Quantity q) (Types.Vector3d v) =
                 v.z / largestComponent
 
             scaledLength =
-                sqrt (scaledX * scaledX + scaledY * scaledY + scaledZ * scaledZ)
+                Hypot.hypot3 scaledX scaledY scaledZ
         in
         Types.Vector3d
             { x = q * scaledX / scaledLength

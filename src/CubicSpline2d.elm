@@ -125,6 +125,7 @@ import BoundingBox2d exposing (BoundingBox2d)
 import Curve
 import Direction2d exposing (Direction2d)
 import Frame2d exposing (Frame2d)
+import Geometry.Hypot as Hypot
 import Geometry.Types as Types
 import Interval exposing (Interval)
 import Parameter1d
@@ -1258,7 +1259,7 @@ derivativeMagnitude (Types.CubicSpline2d spline) =
             y14 =
                 y13 + parameterValue * (y24 - y13)
         in
-        Quantity (3 * sqrt (x14 * x14 + y14 * y14))
+        Quantity (3 * Hypot.hypot2 x14 y14)
 
 
 {-| Determine the number of linear segments needed to approximate a cubic

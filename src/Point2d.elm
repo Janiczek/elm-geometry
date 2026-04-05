@@ -138,6 +138,7 @@ useful when writing generic/library code.
 
 import Angle exposing (Angle)
 import Direction2d exposing (Direction2d)
+import Geometry.Hypot as Hypot
 import Geometry.Types as Types exposing (Axis2d, Frame2d)
 import Length exposing (Meters)
 import Pixels exposing (Pixels)
@@ -972,7 +973,7 @@ distanceFrom (Types.Point2d p1) (Types.Point2d p2) =
                 deltaY / largestComponent
 
             scaledLength =
-                sqrt (scaledX * scaledX + scaledY * scaledY)
+                Hypot.hypot2 scaledX scaledY
         in
         Quantity (scaledLength * largestComponent)
 

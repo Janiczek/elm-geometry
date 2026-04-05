@@ -27,8 +27,14 @@ numApproximationSegments : { maxError : Quantity Float units, maxSecondDerivativ
 numApproximationSegments { maxError, maxSecondDerivativeMagnitude } =
     if maxError |> Quantity.greaterThan Quantity.zero then
         let
+            maxSdd =
+                Quantity.unwrap maxSecondDerivativeMagnitude
+
+            maxErr =
+                Quantity.unwrap maxError
+
             computedNumSegments =
-                sqrt (Quantity.ratio maxSecondDerivativeMagnitude (Quantity.multiplyBy 8 maxError))
+                sqrt (0.125 * maxSdd) * sqrt (1 / maxErr)
         in
         max (ceiling computedNumSegments) 1
 

@@ -362,12 +362,15 @@ pointOn (Types.Arc3d arc) t =
             x =
                 r * sin theta
 
+            halfTheta =
+                0.5 * theta
+
             y =
                 if abs theta < pi / 2 then
-                    x * tan (0.5 * theta)
+                    sin halfTheta * x / cos halfTheta
 
                 else
-                    r * (1 - cos theta)
+                    r - r * cos theta
         in
         Types.Point3d
             { x = p.x + x * u.x + y * v.x

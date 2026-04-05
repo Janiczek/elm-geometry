@@ -131,6 +131,7 @@ import Curve
 import Direction2d exposing (Direction2d)
 import Ellipse2d exposing (Ellipse2d)
 import Frame2d exposing (Frame2d)
+import Geometry.Hypot as Hypot
 import Geometry.Types as Types
 import Parameter1d
 import Point2d exposing (Point2d)
@@ -267,7 +268,7 @@ fromEndpoints arguments =
                 y2
 
             d =
-                sqrt (cx2 * cx2 + cy2 * cy2) / 2
+                0.5 * Hypot.hypot2 cx2 cy2
         in
         if d > 0 && d < 1 then
             let

@@ -166,7 +166,7 @@ from givenStartPoint givenEndPoint givenSweptAngle =
                     Quantity.multiplyBy 0.5 givenSweptAngle
 
                 scale =
-                    1 / (2 * abs (Angle.sin halfAngle))
+                    0.5 / abs (Angle.sin halfAngle)
 
                 computedRadius =
                     Quantity.multiplyBy scale distance

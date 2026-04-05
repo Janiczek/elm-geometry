@@ -89,6 +89,7 @@ contains all of the input boxes.
 
 import BoundingBox2d exposing (BoundingBox2d)
 import Float.Extra as Float
+import Geometry.Hypot as Hypot
 import Geometry.Types as Types
 import Point2d exposing (Point2d)
 import Quantity exposing (Product, Quantity(..), Rate, Unitless)
@@ -942,10 +943,10 @@ length boundingBox =
             Interval.endpoints (Interval.abs (yInterval boundingBox))
 
         minLength =
-            Quantity (sqrt (xMin * xMin + yMin * yMin))
+            Quantity (Hypot.hypot2 xMin yMin)
 
         maxLength =
-            Quantity (sqrt (xMax * xMax + yMax * yMax))
+            Quantity (Hypot.hypot2 xMax yMax)
     in
     Interval.from minLength maxLength
 

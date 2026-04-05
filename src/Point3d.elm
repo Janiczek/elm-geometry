@@ -140,6 +140,7 @@ useful when writing generic/library code.
 
 import Angle exposing (Angle)
 import Direction3d exposing (Direction3d)
+import Geometry.Hypot as Hypot
 import Geometry.Types as Types exposing (Axis3d, Frame3d, Plane3d, SketchPlane3d)
 import Length exposing (Meters)
 import Pixels exposing (Pixels)
@@ -725,7 +726,7 @@ circumenterHelp (Types.Point3d p1) (Types.Point3d p2) (Types.Point3d p3) a b c =
                 (bx * cy - by * cx) / bc
 
             sinA =
-                sqrt (crossX * crossX + crossY * crossY + crossZ * crossZ)
+                Hypot.hypot3 crossX crossY crossZ
         in
         if sinA == 0 then
             Nothing
@@ -1146,7 +1147,7 @@ distanceFrom (Types.Point3d p1) (Types.Point3d p2) =
                 deltaZ / largestComponent
 
             scaledLength =
-                sqrt (scaledX * scaledX + scaledY * scaledY + scaledZ * scaledZ)
+                Hypot.hypot3 scaledX scaledY scaledZ
         in
         Quantity (scaledLength * largestComponent)
 
@@ -1246,7 +1247,7 @@ distanceFromAxis (Types.Axis3d axis) (Types.Point3d p) =
                 perpZ / largestComponent
 
             scaledDistance =
-                sqrt (scaledX * scaledX + scaledY * scaledY + scaledZ * scaledZ)
+                Hypot.hypot3 scaledX scaledY scaledZ
         in
         Quantity (scaledDistance * largestComponent)
 

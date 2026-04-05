@@ -130,6 +130,7 @@ import BoundingBox3d exposing (BoundingBox3d)
 import Curve
 import Direction3d exposing (Direction3d)
 import Frame3d exposing (Frame3d)
+import Geometry.Hypot as Hypot
 import Geometry.Types as Types
 import Interval exposing (Interval)
 import Parameter1d
@@ -574,7 +575,7 @@ derivativeMagnitude (Types.QuadraticSpline3d spline) =
             z13 =
                 z12 + parameterValue * z123
         in
-        Quantity (2 * sqrt (x13 * x13 + y13 * y13 + z13 * z13))
+        Quantity (2 * Hypot.hypot3 x13 y13 z13)
 
 
 {-| Represents a nondegenerate spline (one that has finite, non-zero length).

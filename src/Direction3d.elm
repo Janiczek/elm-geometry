@@ -112,7 +112,8 @@ global XYZ frame:
 
 import Angle exposing (Angle)
 import Direction2d exposing (Direction2d)
-import Geometry.Types as Types exposing (Axis3d, Frame3d, Plane3d, Point3d, SketchPlane3d)
+import Geometry.Hypot as Hypot
+import Geometry.Types as Types exposing (Frame3d, Plane3d, Point3d, SketchPlane3d)
 import Quantity exposing (Quantity(..), Unitless)
 import Quantity.Extra as Quantity
 import Random exposing (Generator)
@@ -509,7 +510,7 @@ from (Types.Point3d p1) (Types.Point3d p2) =
                 deltaZ / largestComponent
 
             scaledLength =
-                sqrt (scaledX * scaledX + scaledY * scaledY + scaledZ * scaledZ)
+                Hypot.hypot3 scaledX scaledY scaledZ
         in
         Just <|
             Types.Direction3d
@@ -552,7 +553,7 @@ perpendicularTo (Types.Direction3d d) =
         if absX <= absZ then
             let
                 scale =
-                    sqrt (d.z * d.z + d.y * d.y)
+                    Hypot.hypot2 d.z d.y
             in
             Types.Direction3d
                 { x = 0
@@ -563,7 +564,7 @@ perpendicularTo (Types.Direction3d d) =
         else
             let
                 scale =
-                    sqrt (d.y * d.y + d.x * d.x)
+                    Hypot.hypot2 d.y d.x
             in
             Types.Direction3d
                 { x = -d.y / scale
@@ -574,7 +575,7 @@ perpendicularTo (Types.Direction3d d) =
     else if absY <= absZ then
         let
             scale =
-                sqrt (d.z * d.z + d.x * d.x)
+                Hypot.hypot2 d.z d.x
         in
         Types.Direction3d
             { x = d.z / scale
@@ -585,7 +586,7 @@ perpendicularTo (Types.Direction3d d) =
     else
         let
             scale =
-                sqrt (d.x * d.x + d.y * d.y)
+                Hypot.hypot2 d.x d.y
         in
         Types.Direction3d
             { x = -d.y / scale
@@ -922,7 +923,7 @@ elevationFrom (Types.SketchPlane3d sketchPlane) (Types.Direction3d d) =
         sketchZ =
             d.x * kx + d.y * ky + d.z * kz
     in
-    Quantity (atan2 sketchZ (sqrt (sketchX * sketchX + sketchY * sketchY)))
+    Quantity (atan2 sketchZ (Hypot.hypot2 sketchX sketchY))
 
 
 {-| Compare two directions within an angular tolerance. Returns true if the
@@ -999,7 +1000,7 @@ angleFrom (Types.Direction3d d1) (Types.Direction3d d2) =
             d1.x * d2.y - d1.y * d2.x
 
         relativeY =
-            sqrt (cx * cx + cy * cy + cz * cz)
+            Hypot.hypot3 cx cy cz
     in
     Quantity (atan2 relativeY relativeX)
 
@@ -1218,7 +1219,7 @@ projectOnto (Types.Plane3d plane) (Types.Direction3d d) =
                 projectedZ / largestComponent
 
             scaledLength =
-                sqrt (scaledX * scaledX + scaledY * scaledY + scaledZ * scaledZ)
+                Hypot.hypot3 scaledX scaledY scaledZ
         in
         Just <|
             Types.Direction3d
@@ -1346,7 +1347,7 @@ projectInto (Types.SketchPlane3d sketchPlane) (Types.Direction3d d) =
                 projectedY / largestComponent
 
             scaledLength =
-                sqrt (scaledX * scaledX + scaledY * scaledY)
+                Hypot.hypot2 scaledX scaledY
         in
         Just <|
             Types.Direction2d

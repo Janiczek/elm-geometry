@@ -128,6 +128,7 @@ import Ellipse3d exposing (Ellipse3d)
 import EllipticalArc2d exposing (EllipticalArc2d)
 import Frame2d
 import Frame3d exposing (Frame3d)
+import Geometry.Hypot as Hypot
 import Geometry.Types as Types
 import Parameter1d
 import Plane3d exposing (Plane3d)
@@ -714,11 +715,23 @@ projectInto sketchPlane arc =
         h =
             Quantity.half (m10 |> Quantity.minus m01)
 
+        (Quantity e_) =
+            e
+
+        (Quantity h_) =
+            h
+
         q =
-            Quantity.sqrt (Quantity.squared e |> Quantity.plus (Quantity.squared h))
+            Quantity (Hypot.hypot2 e_ h_)
+
+        (Quantity f_) =
+            f
+
+        (Quantity g_) =
+            g
 
         r =
-            Quantity.sqrt (Quantity.squared f |> Quantity.plus (Quantity.squared g))
+            Quantity (Hypot.hypot2 f_ g_)
 
         sx =
             q |> Quantity.plus r
